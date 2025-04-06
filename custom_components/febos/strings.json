@@ -1,0 +1,17 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "description": "Login"
+      }
+    },
+    "error": {
+      "invalid_login": "Invalid login.",
+      "unknown_error": "Unknown error."
+    }
+  }
+}

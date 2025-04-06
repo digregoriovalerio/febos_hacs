@@ -1,0 +1,15 @@
+{
+  "domain": "febos",
+  "name": "EmmeTI Febos",
+  "version": "0.0.1",
+  "codeowners": [
+    "@digregoriovalerio"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/digregoriovalerio/febos_integration",
+  "iot_class": "cloud_polling",
+  "loggers": [
+    "febos"
+  ],
+  "requirements": ["febos@git+https://github.com/digregoriovalerio/febos.git@main"]
+}
