@@ -233,13 +233,13 @@ SENSOR_VALUE_MAP = {
     "R8221": lambda v: float(v) / 1000.0,
     "R8222": lambda v: float(v) / 1000.0,
     "R8223": lambda v: float(v) / 1000.0,
-    "R9121": lambda v: float(v) / 1000.0,
-    "R9122": lambda v: float(v) / 1000.0,
-    "R9123": lambda v: float(v) / 1000.0,
-    "R9126": lambda v: float(v) / 1000.0,
-    "R9127": lambda v: float(v) / 1000.0,
-    "R9128": lambda v: float(v) / 1000.0,
-    "R9129": lambda v: float(v) / 1000.0,
+    "R9121": lambda v: float(v) / 100.0,
+    "R9122": lambda v: float(v) / 100.0,
+    "R9123": lambda v: float(v) / 100.0,
+    "R9126": lambda v: float(v) / 100.0,
+    "R9127": lambda v: float(v) / 100.0,
+    "R9128": lambda v: float(v) / 100.0,
+    "R9129": lambda v: float(v) / 100.0,
 }
 
 BINARY_SENSOR_VALUE_MAP = {
@@ -307,7 +307,7 @@ class FebosResourceData:
         def normalize_name(n):
             n = n.replace(" (in KW)", "")
             if "R9127" in n:
-                n = "R9127: Potenza (Sconosciuta)"
+                n = "R9127: Potenza Importata/Esportata"
             return n if len(n) > 0 else "Unknown"
 
         def normalize_sensor_class(u):
