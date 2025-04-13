@@ -1,7 +1,7 @@
 {
   "domain": "febos",
   "name": "EmmeTI Febos",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "codeowners": [
     "@digregoriovalerio"
   ],
@@ -11,5 +11,7 @@
   "loggers": [
     "febos"
   ],
-  "requirements": ["febos@git+https://github.com/digregoriovalerio/febos.git@main"]
+  "requirements": [
+    "febos@git+https://github.com/digregoriovalerio/febos.git@main"
+  ]
 }

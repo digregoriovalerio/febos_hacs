@@ -101,7 +101,6 @@ MISSING_MEASUREMENT_UNIT_MAP = {
     "R8640": "",  # Configurazione potenze 3
     "R8641": "",  # Configurazione potenze 4
     "R8642": "",  # Configurazione potenze 5
-    "R8648": "",  # Stagione
     "R8660": "%",  # Set umidità estate (SetRh_E)
     "R8661": "%",  # Set umidità inverno (SetRh_I)
     "R8664": "",  # Nome Febos Crono
@@ -162,6 +161,7 @@ SENSOR_STATE_CLASS_MAP = {
 }
 
 BINARY_SENSOR_DEVICE_CLASS_MAP = {
+    "R8648": BinarySensorDeviceClass.COLD,
     "R8683": BinarySensorDeviceClass.COLD,
     "R16385": BinarySensorDeviceClass.COLD,
     "R9089": BinarySensorDeviceClass.PROBLEM,
@@ -305,7 +305,7 @@ class FebosResourceData:
         """Parse an EmmeTI Febos resource."""
 
         def normalize_name(n):
-            n = n.replace(" (in KW)", "")
+            n = n.replace(" (in KW)", "").replace("PcD", "PdC")
             if "R9127" in n:
                 n = "R9127: Potenza Importata/Esportata"
             return n if len(n) > 0 else "Unknown"
@@ -361,8 +361,13 @@ class FebosResourceData:
                 value_type=value_type,
             )
 
+        def parse_input_type(t, c):
+            if c in BINARY_SENSOR_DEVICE_CLASS_MAP:
+                return bool
+            return INPUT_TYPE_MAP[t]
+
         name = normalize_name(resource.label)
-        value_type = INPUT_TYPE_MAP[resource.inputType]
+        value_type = parse_input_type(resource.inputType, resource.code)
         if value_type is bool:
             return parse_binary_sensor(name, resource.code)
         if value_type in [int, float, str]:
@@ -375,28 +380,28 @@ class FebosResourceData:
 SLAVE_RESOURCES = {
     "callTemp": FebosResourceData(
         id="S01",
-        name="Chiamata Temperatura",
+        name="S01: Chiamata Temperatura",
         type=Platform.BINARY_SENSOR,
         sensor_class=BinarySensorDeviceClass.HEAT,
         value_type=bool,
     ),
     "callHumid": FebosResourceData(
         id="S02",
-        name="Chiamata Umidità",
+        name="S02: Chiamata Umidità",
         type=Platform.BINARY_SENSOR,
         sensor_class=BinarySensorDeviceClass.HEAT,
         value_type=bool,
     ),
     "stagione": FebosResourceData(
         id="S03",
-        name="Stagione",
+        name="S03: Stagione",
         type=Platform.BINARY_SENSOR,
         sensor_class=BinarySensorDeviceClass.COLD,
         value_type=bool,
     ),
     "setTemp": FebosResourceData(
         id="S04",
-        name="Set Temperatura",
+        name="S04: Set Temperatura",
         type=Platform.SENSOR,
         sensor_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -405,7 +410,7 @@ SLAVE_RESOURCES = {
     ),
     "temp": FebosResourceData(
         id="S05",
-        name="Temperatura",
+        name="S05: Temperatura",
         type=Platform.SENSOR,
         sensor_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -414,7 +419,7 @@ SLAVE_RESOURCES = {
     ),
     "humid": FebosResourceData(
         id="S06",
-        name="Umidità",
+        name="S06: Umidità",
         type=Platform.SENSOR,
         sensor_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
@@ -423,7 +428,7 @@ SLAVE_RESOURCES = {
     ),
     "confort": FebosResourceData(
         id="S07",
-        name="Comfort",
+        name="S07: Comfort",
         type=Platform.BINARY_SENSOR,
         sensor_class=BinarySensorDeviceClass.PRESENCE,
         value_type=bool,
