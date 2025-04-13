@@ -15,6 +15,8 @@ from homeassistant.const import (
     CURRENCY_EURO,
     PERCENTAGE,
     Platform,
+    UnitOfElectricCurrent,
+    UnitOfElectricPotential,
     UnitOfEnergy,
     UnitOfPower,
     UnitOfTemperature,
@@ -33,13 +35,19 @@ def unique_key(*args) -> str:
     )
 
 
+def int16(v):
+    """Convert a two's complement 16-bits integer into an int."""
+    v = int(v)
+    return v if v < 32768 else v - 65536
+
+
 IGNORED_RESOURCES = [
     "R8205",
     "R8206",
     "R8207",
 ]
 
-MISSING_MEASUREMENT_UNIT_MAP = {
+OVERRIDE_MEASUREMENT_UNIT_MAP = {
     "CT_UPTIME": "",  # Uptime
     "CT_VPN_IP": "",  # OpenVPN IP Address
     "R16493": "",  # Orario della prima richiesta ACS
@@ -48,6 +56,17 @@ MISSING_MEASUREMENT_UNIT_MAP = {
     "R16496": "°C",  # Set temp. della seconda richiesta ACS
     "R16497": "°C",  # Set temp. di mantenimento ACS
     "R16515": "°C",  # Set di Rugiada/Umidita
+    "R8002": "kW",  # Potenza media DIE1
+    "R8005": "kW",  # Potenza media DIE2
+    "R8008": "kW",  # Potenza media DIE3
+    "R8011": "kW",  # Potenza media DIE4
+    "R8100": "V",  # Tensione TAE1
+    "R8105": "kW",  # Potenza attiva TAE1
+    "R8110": "kW",  # Potenza attiva TAE2
+    "R8111": "A",  # Corrente TAE1
+    "R8112": "A",  # Corrente TAE2
+    "R8113": "",  # Sfasamento TAE1
+    "R8114": "",  # Sfasamento TAE2
     "R8200": "",  # Superparametro 1
     "R8201": "",  # Superparametro 2
     "R8202": "",  # Superparametro 3
@@ -125,20 +144,16 @@ MISSING_MEASUREMENT_UNIT_MAP = {
     "R8772": "watt/h",  # Energia_Risc_Pdc
     "R8773": "watt/h",  # Energia_Raff_Pdc
     "R8774": "",  # EER/COP
-    "R8967": "",  # Sbrinamento
     "R9008": "",  # Step frequenza PdC
     "R9042": "°C",  # Temperatura minima acqua Radiante
     "R9051": "°C",  # Temperatura attuale Acqua PdC
     "R9052": "°C",  # Set temperatura Acqua PdC
-    "R9071": "",  # Riscaldamento Add.
-    "R9072": "",  # Valvola 3 Vie
-    "R9076": "",  # Fotovoltaico
-    "R9078": "",  # Antigelo
-    "R9079": "",  # Antigelo_2
 }
 
 MEASUREMENT_UNIT_MAP = {
     "kW": UnitOfPower.KILO_WATT,
+    "V": UnitOfElectricPotential.VOLT,
+    "A": UnitOfElectricCurrent.AMPERE,
     "°C": UnitOfTemperature.CELSIUS,
     "°": UnitOfTemperature.CELSIUS,
     "h": UnitOfTime.HOURS,
@@ -198,17 +213,21 @@ INPUT_TYPE_MAP = {
     "STRING": str,
 }
 
+
 SENSOR_VALUE_MAP = {
     "R9120": lambda v: float(v) * 60.0,
-    "R8702": lambda v: float(v) / 10.0,
-    "R8703": lambda v: float(v) / 10.0,
-    "R8678": lambda v: float(v) / 10.0,
+    "R8100": lambda v: float(v) / 10.0,
     "R8665": lambda v: float(v) / 10.0,
     "R8666": lambda v: float(v) / 10.0,
+    "R8678": lambda v: float(v) / 10.0,
     "R8680": lambda v: float(v) / 10.0,
+    "R8698": lambda v: float(v) / 10.0,
+    "R8702": lambda v: float(v) / 10.0,
+    "R8703": lambda v: float(v) / 10.0,
     "R8986": lambda v: float(v) / 10.0,
     "R8987": lambda v: float(v) / 10.0,
     "R8988": lambda v: float(v) / 10.0,
+    "R8989": lambda v: float(v) / 10.0,
     "R9042": lambda v: float(v) / 10.0,
     "R9051": lambda v: float(v) / 10.0,
     "R9052": lambda v: float(v) / 10.0,
@@ -224,8 +243,6 @@ SENSOR_VALUE_MAP = {
     "R16495": lambda v: float(v) / 10.0,
     "R16496": lambda v: float(v) / 10.0,
     "R16497": lambda v: float(v) / 10.0,
-    "R8989": lambda v: float(v) / 10.0,
-    "R8698": lambda v: float(v) / 10.0,
     "R16515": lambda v: float(v) / 10.0,
     "S04": lambda v: float(v) / 10.0,
     "S05": lambda v: float(v) / 10.0,
@@ -233,11 +250,6 @@ SENSOR_VALUE_MAP = {
     "R8686": lambda v: float(v) / 100.0,
     "R8688": lambda v: float(v) / 100.0,
     "R8690": lambda v: float(v) / 100.0,
-    "R16534": lambda v: float(v) / 100.0,
-    "R8220": lambda v: float(v) / 1000.0,
-    "R8221": lambda v: float(v) / 1000.0,
-    "R8222": lambda v: float(v) / 1000.0,
-    "R8223": lambda v: float(v) / 1000.0,
     "R9121": lambda v: float(v) / 100.0,
     "R9122": lambda v: float(v) / 100.0,
     "R9123": lambda v: float(v) / 100.0,
@@ -245,6 +257,19 @@ SENSOR_VALUE_MAP = {
     "R9127": lambda v: float(v) / 100.0,
     "R9128": lambda v: float(v) / 100.0,
     "R9129": lambda v: float(v) / 100.0,
+    "R16534": lambda v: float(v) / 100.0,
+    "R8002": lambda v: float(int16(v)) / 1000.0,
+    "R8005": lambda v: float(int16(v)) / 1000.0,
+    "R8008": lambda v: float(int16(v)) / 1000.0,
+    "R8011": lambda v: float(int16(v)) / 1000.0,
+    "R8105": lambda v: float(int16(v)) / 1000.0,
+    "R8110": lambda v: float(int16(v)) / 1000.0,
+    "R8111": lambda v: float(v) / 1000.0,
+    "R8112": lambda v: float(v) / 1000.0,
+    "R8220": lambda v: float(v) / 1000.0,
+    "R8221": lambda v: float(v) / 1000.0,
+    "R8222": lambda v: float(v) / 1000.0,
+    "R8223": lambda v: float(v) / 1000.0,
 }
 
 BINARY_SENSOR_VALUE_MAP = {
@@ -310,7 +335,11 @@ class FebosResourceData:
         """Parse an EmmeTI Febos resource."""
 
         def normalize_name(n):
-            n = n.replace(" (in KW)", "").replace("PcD", "PdC")
+            n = (
+                n.replace(" (in KW)", "")
+                .replace("PcD", "PdC")
+                .replace(" (la tensione è unica per i due canali)", "")
+            )
             if "R9127" in n:
                 n = "R9127: Potenza Importata/Esportata"
             return n if len(n) > 0 else "Unknown"
@@ -330,17 +359,20 @@ class FebosResourceData:
                 return SensorDeviceClass.DURATION
             if u in UnitOfEnergy:
                 return SensorDeviceClass.ENERGY
+            if u in UnitOfElectricPotential:
+                return SensorDeviceClass.VOLTAGE
+            if u in UnitOfElectricCurrent:
+                return SensorDeviceClass.CURRENT
             if u in UnitOfVolumeFlowRate:
                 return SensorDeviceClass.VOLUME_FLOW_RATE
             LOGGER.error(f"Unknown sensor class for {u!r}")
             raise ValueError(u)
 
         def normalize_measurement_unit(u, c):
+            u = OVERRIDE_MEASUREMENT_UNIT_MAP.get(c, u)
             if u is None:
-                if c not in MISSING_MEASUREMENT_UNIT_MAP:
-                    LOGGER.error(f"Missing measurement unit in {c}")
-                    raise ValueError(c)
-                u = MISSING_MEASUREMENT_UNIT_MAP[c]
+                LOGGER.error(f"Missing measurement unit in {c}")
+                raise ValueError(c)
             return MEASUREMENT_UNIT_MAP.get(u, "")
 
         def parse_binary_sensor(n, c):
