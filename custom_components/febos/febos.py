@@ -148,9 +148,17 @@ OVERRIDE_MEASUREMENT_UNIT_MAP = {
     "R9042": "°C",  # Temperatura minima acqua Radiante
     "R9051": "°C",  # Temperatura attuale Acqua PdC
     "R9052": "°C",  # Set temperatura Acqua PdC
+    "R9121": "watt",
+    "R9122": "watt",
+    "R9123": "watt",
+    "R9126": "watt",
+    "R9127": "watt",
+    "R9128": "watt",
+    "R9129": "watt",
 }
 
 MEASUREMENT_UNIT_MAP = {
+    "watt": UnitOfPower.WATT,
     "kW": UnitOfPower.KILO_WATT,
     "V": UnitOfElectricPotential.VOLT,
     "A": UnitOfElectricCurrent.AMPERE,
@@ -250,13 +258,13 @@ SENSOR_VALUE_MAP = {
     "R8686": lambda v: float(v) / 100.0,
     "R8688": lambda v: float(v) / 100.0,
     "R8690": lambda v: float(v) / 100.0,
-    "R9121": lambda v: float(v) / 100.0,
-    "R9122": lambda v: float(v) / 100.0,
-    "R9123": lambda v: float(v) / 100.0,
-    "R9126": lambda v: float(v) / 100.0,
-    "R9127": lambda v: float(v) / 100.0,
-    "R9128": lambda v: float(v) / 100.0,
-    "R9129": lambda v: float(v) / 100.0,
+    "R9121": lambda v: float(v) * 10.0,
+    "R9122": lambda v: float(v) * 10.0,
+    "R9123": lambda v: float(v) * 10.0,
+    "R9126": lambda v: float(v) * 10.0,
+    "R9127": lambda v: float(v) * 10.0,
+    "R9128": lambda v: float(v) * 10.0,
+    "R9129": lambda v: float(v) * 10.0,
     "R16534": lambda v: float(v) / 100.0,
     "R8002": lambda v: float(int16(v)) / 1000.0,
     "R8005": lambda v: float(int16(v)) / 1000.0,
