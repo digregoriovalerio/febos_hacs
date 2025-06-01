@@ -61,8 +61,8 @@ OVERRIDE_MEASUREMENT_UNIT_MAP = {
     "R8008": "kW",  # Potenza media DIE3
     "R8011": "kW",  # Potenza media DIE4
     "R8100": "V",  # Tensione TAE1
-    "R8105": "kW",  # Potenza attiva TAE1
-    "R8110": "kW",  # Potenza attiva TAE2
+    "R8105": "watt",  # Potenza attiva TAE1
+    "R8110": "watt",  # Potenza attiva TAE2
     "R8111": "A",  # Corrente TAE1
     "R8112": "A",  # Corrente TAE2
     "R8113": "",  # Sfasamento TAE1
@@ -270,8 +270,8 @@ SENSOR_VALUE_MAP = {
     "R8005": lambda v: float(int16(v)) / 1000.0,
     "R8008": lambda v: float(int16(v)) / 1000.0,
     "R8011": lambda v: float(int16(v)) / 1000.0,
-    "R8105": lambda v: float(int16(v)) / 1000.0,
-    "R8110": lambda v: float(int16(v)) / 1000.0,
+    "R8105": lambda v: float(int16(v)),
+    "R8110": lambda v: float(int16(v)),
     "R8111": lambda v: float(v) / 1000.0,
     "R8112": lambda v: float(v) / 1000.0,
     "R8220": lambda v: float(v) / 1000.0,
