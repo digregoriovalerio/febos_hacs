@@ -6,9 +6,11 @@ from homeassistant.const import Platform
 
 DOMAIN = "febos"
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [
+    Platform.BINARY_SENSOR,
+    Platform.SENSOR,
+    Platform.SWITCH,
+    Platform.NUMBER,
+]
 
 LOGGER = logging.getLogger(__package__)
-FORMAT = "[%(filename)s:%(lineno)s] [%(funcName)s()] %(message)s"
-logging.basicConfig(format=FORMAT)
-LOGGER.setLevel(logging.DEBUG)
