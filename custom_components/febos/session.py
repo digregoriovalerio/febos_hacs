@@ -155,8 +155,12 @@ class FebosSession:
                     )
 
             for page in response.pageMap.values():
+                groups[installation_id].update(page.inputGroupGetCodeList)
                 for tab in page.tabList:
+                    for map in tab.inputGroupGetCodeMap.values():
+                        groups[installation_id].update(map)
                     for widget in tab.widgetList:
+                        groups[installation_id].update(widget.inputGroupGetCodeList)
                         for group in widget.widgetInputGroupList:
                             groups[installation_id].add(group.inputGroupGetCode)
                             for input_entry in group.inputList:
