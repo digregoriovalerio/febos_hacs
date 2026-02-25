@@ -35,32 +35,58 @@ def int16(v: int):
     return v if v < 32768 else v - 65536
 
 
-def tenth(v: int | float) -> float:
-    return float(v) / 10.0
-
-
-def hundred(v: int | float) -> float:
-    return float(v) / 100.0
-
-
-def thousand(v: int | float) -> float:
-    return float(v) / 1000.0
+def uint16(v: int):
+    """Convert an int into a two's complement 16-bits integer."""
+    v = int(v)
+    return v + 32768
 
 
 def ctwo(v: int) -> float:
     return float(int16(v))
 
 
-def ctwo_thousand(v: int) -> float:
-    return float(int16(v)) / 1000.0
+def ctwo_thousandth(v: int) -> float:
+    return ctwo(v) / 1000.0
 
 
-def by_ten(v: int | float) -> float:
+def tenth(v: int | float) -> float:
+    return float(v) / 10.0
+
+
+def sixtieth(v: int | float) -> float:
+    return float(v) / 60.0
+
+
+def hundredth(v: int | float) -> float:
+    return float(v) / 100.0
+
+
+def thousandth(v: int | float) -> float:
+    return float(v) / 1000.0
+
+
+def unctwo(v: int) -> float:
+    return float(uint16(v))
+
+
+def unctwo_thousand(v: int) -> float:
+    return unctwo(v) * 1000.0
+
+
+def ten(v: int | float) -> float:
     return float(v) * 10.0
 
 
-def by_sixty(v: int | float) -> float:
+def sixty(v: int | float) -> float:
     return float(v) * 60.0
+
+
+def hundred(v: int | float) -> float:
+    return float(v) * 100.0
+
+
+def thousand(v: int | float) -> float:
+    return float(v) * 1000.0
 
 
 class NormalizedInput:
@@ -94,10 +120,14 @@ class NormalizedInput:
 
     @property
     def min(self) -> int | None:
+        if self.measurement_unit == UnitOfTime.MINUTES:
+            return 0
         return self._input.min
 
     @property
     def max(self) -> int | None:
+        if self.measurement_unit == UnitOfTime.MINUTES:
+            return 60*24
         return self._input.max
 
     @property
@@ -136,20 +166,19 @@ class NormalizedInput:
             )
 
     @property
-    def _scaled_value(self):
-        value = self.value
-        if value is None:
+    def _scaled_value(self) -> Any:
+        if self.value is None:
             return None
-        return {
-            "R9120": by_sixty,
-            "R8208": thousand,
-            "R8209": thousand,
-            "R8211": thousand,
-            "R8212": thousand,
-            "R8214": thousand,
-            "R8215": thousand,
-            "R8217": thousand,
-            "R8218": thousand,
+        value = {
+            "R9120": sixty,
+            "R8208": thousandth,
+            "R8209": thousandth,
+            "R8211": thousandth,
+            "R8212": thousandth,
+            "R8214": thousandth,
+            "R8215": thousandth,
+            "R8217": thousandth,
+            "R8218": thousandth,
             "R8100": tenth,
             "R8665": tenth,
             "R8666": tenth,
@@ -174,35 +203,35 @@ class NormalizedInput:
             "R16455": tenth,
             "R16457": tenth,
             "R16494": tenth,
-            "R16495": tenth,
             "R16496": tenth,
             "R16497": tenth,
             "R16515": tenth,
-            "R8684": hundred,
-            "R8686": hundred,
-            "R8688": hundred,
-            "R8690": hundred,
-            "R9121": by_ten,
-            "R9122": by_ten,
-            "R9123": by_ten,
-            "R9126": by_ten,
-            "R9127": by_ten,
-            "R9128": by_ten,
-            "R9129": by_ten,
-            "R16534": hundred,
-            "R8002": ctwo_thousand,
-            "R8005": ctwo_thousand,
-            "R8008": ctwo_thousand,
-            "R8011": ctwo_thousand,
+            "R8684": hundredth,
+            "R8686": hundredth,
+            "R8688": hundredth,
+            "R8690": hundredth,
+            "R9121": ten,
+            "R9122": ten,
+            "R9123": ten,
+            "R9126": ten,
+            "R9127": ten,
+            "R9128": ten,
+            "R9129": ten,
+            "R16534": hundredth,
+            "R8002": ctwo_thousandth,
+            "R8005": ctwo_thousandth,
+            "R8008": ctwo_thousandth,
+            "R8011": ctwo_thousandth,
             "R8105": ctwo,
             "R8110": ctwo,
-            "R8111": thousand,
-            "R8112": thousand,
-            "R8220": thousand,
-            "R8221": thousand,
-            "R8222": thousand,
-            "R8223": thousand,
-        }.get(self._input.code, lambda v: v)(value)
+            "R8111": thousandth,
+            "R8112": thousandth,
+            "R8220": thousandth,
+            "R8221": thousandth,
+            "R8222": thousandth,
+            "R8223": thousandth,
+        }.get(self._input.code, lambda v: v)(self.value)
+        return self.value_type(value)
 
     @property
     def binary_sensor_normalized_value(self) -> bool | None:
@@ -276,8 +305,9 @@ class NormalizedInput:
         """
         mu = {
             "CT_UPTIME": UnitOfTime.HOURS, # Uptime
+            "R16493": UnitOfTime.MINUTES,  # Orario della prima richiesta ACS
             "R16494": UnitOfTemperature.CELSIUS,  # Set temp. della prima richiesta ACS
-            "R16495": UnitOfTemperature.CELSIUS,  # Set temp. della seconda richiesta ACS
+            "R16495": UnitOfTime.MINUTES,  # Orario della seconda richiesta ACS
             "R16496": UnitOfTemperature.CELSIUS,  # Set temp. della seconda richiesta ACS
             "R16497": UnitOfTemperature.CELSIUS,  # Set temp. di mantenimento ACS
             "R16515": UnitOfTemperature.CELSIUS,  # Set di Rugiada/Umidita
@@ -344,7 +374,6 @@ class NormalizedInput:
             "R9127": UnitOfPower.WATT,
             "R9128": UnitOfPower.WATT,
             "R9129": UnitOfPower.WATT,
-            "R16493": UnitOfTime.MINUTES
         }.get(self._input.code, self._input.measUnit)
         mu = mu if mu else ""
         mu = {
@@ -384,6 +413,8 @@ class NormalizedInput:
             .replace("_", " ")
             .strip()
         )
+        if self._input.code == "R16495":
+            name = "Orario della seconda richiesta ACS"
         if not name:
             name = "Sconosciuto"
         return f"{self._input.code}: {name}"
@@ -578,3 +609,70 @@ class NormalizedInput:
         if self.entity_type == Platform.NUMBER:
             return self.number_normalized_value
         raise ValueError(f"Unsupported entity type '{self.entity_type}'")
+
+    def to_original_scale(self, value: Any) -> Any:
+        if value is None:
+            return None
+        value = {
+            "R9120": sixtieth,
+            "R8208": thousand,
+            "R8209": thousand,
+            "R8211": thousand,
+            "R8212": thousand,
+            "R8214": thousand,
+            "R8215": thousand,
+            "R8217": thousand,
+            "R8218": thousand,
+            "R8100": ten,
+            "R8665": ten,
+            "R8666": ten,
+            "R8678": ten,
+            "R8680": ten,
+            "R8698": ten,
+            "R8702": ten,
+            "R8703": ten,
+            "R8986": ten,
+            "R8987": ten,
+            "R8988": ten,
+            "R8989": ten,
+            "R9042": ten,
+            "R9051": ten,
+            "R9052": ten,
+            "R16444": ten,
+            "R16446": ten,
+            "R16448": ten,
+            "R16450": ten,
+            "R16451": ten,
+            "R16453": ten,
+            "R16455": ten,
+            "R16457": ten,
+            "R16494": ten,
+            "R16496": ten,
+            "R16497": ten,
+            "R16515": ten,
+            "R8684": hundred,
+            "R8686": hundred,
+            "R8688": hundred,
+            "R8690": hundred,
+            "R9121": tenth,
+            "R9122": tenth,
+            "R9123": tenth,
+            "R9126": tenth,
+            "R9127": tenth,
+            "R9128": tenth,
+            "R9129": tenth,
+            "R16534": hundred,
+            "R8002": unctwo_thousand,
+            "R8005": unctwo_thousand,
+            "R8008": unctwo_thousand,
+            "R8011": unctwo_thousand,
+            "R8105": unctwo,
+            "R8110": unctwo,
+            "R8111": thousand,
+            "R8112": thousand,
+            "R8220": thousand,
+            "R8221": thousand,
+            "R8222": thousand,
+            "R8223": thousand,
+        }.get(self._input.code, lambda v: v)(value)
+        return self.value_type(value)

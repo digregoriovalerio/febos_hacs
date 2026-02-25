@@ -271,6 +271,7 @@ class FebosSession:
             return None
 
         input = self.inputs_map[key]
+        value = input.to_original_scale(value)
         realtime_data = RealtimeDataEndpoint(
             installation_id=input.installation_id,
             input_group_list=self.groups[input.installation_id],
