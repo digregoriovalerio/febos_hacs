@@ -6,6 +6,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
 )
+from homeassistant.components.number.const import NumberMode
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.components.number import NumberEntity, NumberEntityDescription
@@ -180,10 +181,13 @@ class FebosNumberEntity(CoordinatorEntity, NumberEntity):
         self._attr_unique_id = input.key
         self._attr_device_info = input.device_info
         self._attr_name = input.label
+        self._attr_mode = NumberMode.BOX
         if input.min is not None:
             self._attr_native_min_value = float(input.min)
         if input.max is not None:
             self._attr_native_max_value = float(input.max)
+        if input.step is not None:
+            self._attr_native_step = input.step
 
     @property
     def native_value(self) -> int:

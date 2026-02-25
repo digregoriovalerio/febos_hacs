@@ -131,6 +131,12 @@ class NormalizedInput:
         return self._input.max
 
     @property
+    def step(self) -> float | None:
+        if self._input.code in ["R16534"]:
+            return 0.01
+        return None
+
+    @property
     def code(self) -> str:
         return self._input.code
         
@@ -286,6 +292,8 @@ class NormalizedInput:
         """
         if self._input.code in ["R8648", "R8967", "R9071", "R9072", "R9076", "R9078", "R9079"]:
             return bool
+        if self._input.code in ["R16534"]:
+            return float
         return {
             "INT": int,
             "FLOAT": float,
