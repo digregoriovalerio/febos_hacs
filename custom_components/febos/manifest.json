@@ -13,6 +13,6 @@
     "febos"
   ],
   "requirements": [
-    "febos@git+https://github.com/digregoriovalerio/febos.git@main"
+    "febos@git+https://github.com/digregoriovalerio/febos.git@v1.0.1"
   ]
 }
